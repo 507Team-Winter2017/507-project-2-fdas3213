@@ -5,7 +5,7 @@ import re
 
 
 #### Problem 1 ####
-'''print('\n*********** PROBLEM 1 ***********')
+print('\n*********** PROBLEM 1 ***********')
 print('New York Times -- First 10 Story Headings\n')
 
 
@@ -62,7 +62,7 @@ for img in img_soup.find_all('img'):
 	img_list.append(word)
 
 for ind in range(len(img_list)):
-	print(img_list[ind])'''
+	print(img_list[ind])
 
 
 
