@@ -36,17 +36,11 @@ print('Michigan Daily -- MOST READ\n')
 mi_url = 'https://www.michigandaily.com'
 mi_soup = generate_soup(mi_url)
 
-most_read = []
 for heading in mi_soup.find_all('li'):
 	for a in heading.find_all('a'):
 		text = a.get_text()
 		if len(text) > 15:
-			most_read.append(text)
-
-
-for ind in range(5):
-	print(most_read[ind])
-
+			print(text)
 
 
 #### Problem 3 ####
@@ -55,14 +49,10 @@ print("Mark's page -- Alt tags\n")
 
 img_url = 'http://newmantaylor.com/gallery.html'
 img_soup = generate_soup(img_url)
-img_list = []
 
 for img in img_soup.find_all('img'):
 	word = img.get('alt') if img.get('alt') else 'No alternative text provided!'
-	img_list.append(word)
-
-for ind in range(len(img_list)):
-	print(img_list[ind])
+	print(word)
 
 
 
@@ -83,14 +73,14 @@ um_url = 'https://www.si.umich.edu'
 
 email_soup = get_soup(email_url)
 
-def get_email(soup):
+def get_url(soup):
 	for alt in soup.find_all('a'):
 		if alt.get_text() == 'Contact Details':
 			hr = alt.get('href')
 			url = um_url + hr
 			contact.append(url)
 
-get_email(email_soup)
+get_url(email_soup)
 
 def next_page(soup):
 	for alt in soup.find_all('a', title = 'Go to next page'):
@@ -102,7 +92,7 @@ def add_soup(soup):
 	for i in range(5):
 		num_soup = next_page(soup)
 		soup = num_soup
-		get_email(num_soup)
+		get_url(num_soup)
 
 add_soup(email_soup)
 
