@@ -1,15 +1,23 @@
 #proj2.py
 import urllib.parse, urllib.error, urllib.request
 from bs4 import BeautifulSoup
+import re
 
 
 #### Problem 1 ####
-print('\n*********** PROBLEM 1 ***********')
+'''print('\n*********** PROBLEM 1 ***********')
 print('New York Times -- First 10 Story Headings\n')
-baseurl = 'http://www.nytimes.com'
-html = urllib.request.urlopen(baseurl)
-soup = BeautifulSoup(html, 'html.parser')
+
+
+nytimes_url = 'http://www.nytimes.com'
+def generate_soup(url):
+	html = urllib.request.urlopen(url)
+	soup = BeautifulSoup(html, 'html.parser')
+	return soup
+
+soup = generate_soup(nytimes_url)
 story_heading = []
+
 for heading in soup.find_all(class_='story-heading'):
 	if heading not in story_heading:
 		if heading.a:
@@ -26,14 +34,15 @@ print('\n*********** PROBLEM 2 ***********')
 print('Michigan Daily -- MOST READ\n')
 
 mi_url = 'https://www.michigandaily.com'
-mi_html = urllib.request.urlopen(mi_url)
-mi_soup = BeautifulSoup(mi_html, 'html.parser')
+mi_soup = generate_soup(mi_url)
+
 most_read = []
 for heading in mi_soup.find_all('li'):
 	for a in heading.find_all('a'):
 		text = a.get_text()
 		if len(text) > 15:
 			most_read.append(text)
+
 
 for ind in range(5):
 	print(most_read[ind])
@@ -45,24 +54,64 @@ print('\n*********** PROBLEM 3 ***********')
 print("Mark's page -- Alt tags\n")
 
 img_url = 'http://newmantaylor.com/gallery.html'
-img_html = urllib.request.urlopen(img_url)
-img_soup = BeautifulSoup(img_html, 'html.parser')
+img_soup = generate_soup(img_url)
 img_list = []
 
 for img in img_soup.find_all('img'):
-	if img.get('alt'):
-		word = img.get('alt')
-	else:
-		word = None
+	word = img.get('alt') if img.get('alt') else 'No alternative text provided!'
 	img_list.append(word)
 
 for ind in range(len(img_list)):
-	print(img_list[ind])
+	print(img_list[ind])'''
 
 
 
-'''#### Problem 4 ####
+#### Problem 4 ####
 print('\n*********** PROBLEM 4 ***********')
 print("UMSI faculty directory emails\n")
+pattern = '.*@umich.edu'
+contact = []
 
-### Your Problem 4 solution goes here'''
+def get_soup(url):
+	r = urllib.request.Request(url, None, {'User-Agent': 'SI_CLASS'})
+	html = urllib.request.urlopen(r)
+	soup = BeautifulSoup(html, 'html.parser')
+	return soup
+
+email_url = 'https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=4'
+um_url = 'https://www.si.umich.edu'
+
+email_soup = get_soup(email_url)
+
+def get_email(soup):
+	for alt in soup.find_all('a'):
+		if alt.get_text() == 'Contact Details':
+			hr = alt.get('href')
+			url = um_url + hr
+			contact.append(url)
+
+get_email(email_soup)
+
+def next_page(soup):
+	for alt in soup.find_all('a', title = 'Go to next page'):
+		page = um_url + alt.get('href')
+		soup = get_soup(page)
+	return soup
+
+def add_soup(soup):
+	for i in range(5):
+		num_soup = next_page(soup)
+		soup = num_soup
+		get_email(num_soup)
+
+add_soup(email_soup)
+
+for url in contact:
+	ind_soup = get_soup(url)
+	for di in ind_soup.find_all('div', class_='field-item even'):
+		for alt in di.find_all('a'):
+			if re.search(pattern, alt.get_text()):
+				print(alt.get_text())
+
+
+
